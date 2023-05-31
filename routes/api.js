@@ -1,0 +1,48 @@
+"use strict";
+
+const Translator = require("../components/translator.js");
+
+module.exports = function (app) {
+  const translator = new Translator();
+
+  app.route("/api/translate").post((req, res) => {
+    try {
+      const { text, locale } = req.body;
+
+      if (text == "") {
+        res.json({ error: "No text to translate" });
+        return;
+      }
+
+      if (!text || !locale) {
+        res.json({ error: "Required field(s) missing" });
+        return;
+      }
+
+      if (text == "") {
+        res.json({ error: "No text to translate" });
+        return;
+      }
+
+      let translation = "";
+
+      if (locale == "american-to-british") {
+        translation = translator.toBritishEnglish(text);
+      } else if (locale == "british-to-american") {
+        translation = translator.toAmericanEnglish(text);
+      } else {
+        res.json({ error: "Invalid value for locale field" });
+        return;
+      }
+
+      if (translation == text || !translation) {
+        res.json({ text, translation: "Everything looks good to me!" });
+        return;
+      } else {
+        res.json({ text, translation: translation[1] });
+      }
+    } catch (error) {
+      res.json({ error: error.message });
+    }
+  });
+};
